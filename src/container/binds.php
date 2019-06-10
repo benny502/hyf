@@ -1,6 +1,7 @@
 <?php
 namespace hyf\container;
 
+use hyf\component\db\redis;
 use hyf\container\core\container;
 use hyf\component\db\mysql;
 use hyf\component\io\output;
@@ -17,7 +18,8 @@ class binds
         'mysql_slave' => [
             'class' => mysql::class, 
             'config' => 'mysql_slave'
-        ], 
+        ],
+        'redis' => redis::class,
         'output' => output::class
     ];
 

@@ -1,8 +1,6 @@
 <?php
 namespace hyf\component\db;
 
-use hyf\facade\config;
-
 class mysql
 {
 
