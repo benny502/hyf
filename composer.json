@@ -15,9 +15,9 @@
     "autoload": {
         "psr-4": {
             "hyf\\": "src/"
-        }
-    },
-    "classmap": [
-        "src/Hyf.php"
-    ]
+        },
+        "classmap": [
+            "src/Hyf.php"
+        ]
+    }
 }
