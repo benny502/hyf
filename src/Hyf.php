@@ -73,8 +73,8 @@ class Hyf
     /**
      * 启动脚本
      */
-    public static function Run($server_config)
+    public static function Run($type = 'http')
     {
-        \hyf\server\start::run($server_config);
+        \hyf\server\start::run($type);
     }
 }

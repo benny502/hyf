@@ -16,12 +16,28 @@ class start
     private static function parseCli()
     {
         global $argv;
-        
-        if (! isset($argv[1])) {
-            exit("使用方法 php yourfile.php {start|stop|killall} (-d)\n");
+
+        if (!isset($argv[1]) && !isset($argv[2])) {
+            exit("使用方法 php {http|timer} app_name {start|stop|killall} (-d)\n");
         }
-        
-        if (! in_array($argv[1], [
+
+        if (!in_array($argv[0], [
+            'http',
+            'timer'
+        ])) {
+            exit("参数使用不正确\n");
+        }
+
+        $conf_path = \Hyf::$dir . 'application' . '/' . $argv[1] . '/conf/server.ini';
+        if ($argv[0] != 'timer' && !file_exists($conf_path)) {
+            exit("服务器参数配置不正确\n");
+        } else {
+            $server_config = parse_ini_file($conf_path, true);
+        }
+
+        $server_config['app_name'] = $argv[1];
+
+        if (!in_array($argv[2], [
             'start',
             'stop',
             'killall'
@@ -29,11 +45,11 @@ class start
             exit("参数使用不正确\n");
         }
         
-        if (isset($argv[2]) && $argv[2] == '-d') {
+        if (isset($argv[3]) && $argv[3] == '-d') {
             self::$daemonize = true;
         }
         
-        return $argv[1];
+        return [$argv[2], $server_config];
     }
     
     private static function get_master_pid($master_name)
@@ -41,10 +57,11 @@ class start
         self::$master_pid = trim(shell_exec("pidof {$master_name}"));
     }
     
-    public static function run($server_config)
+    public static function run($server_type)
     {
         try {
-            $action = self::parseCli();
+            list($action, $server_config) = self::parseCli();
+            $server_config['service_type'] = $server_type;
             if ($server_config['service_type'] == 'timer') {
                 $server_config['process_name'] = [
                     'master' => 'hy_' . $server_config['app_name'] . '_master_worker',
