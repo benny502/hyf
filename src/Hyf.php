@@ -3,7 +3,7 @@ namespace hyf;
 /**
  * Class Hyf
  *
- * @author Makle <zhang.tao@hylinkad.com>
+ * @author
  */
 class Hyf
 {

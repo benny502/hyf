@@ -10,7 +10,7 @@
  * process定时器：
  *  将会创建对应定时器数量的子进程来处理定时任务，定时器数量与子进程关系为一一对应。
  *  
- *  @author Makle <zhang.tao@hylinkad.com>
+ *  @author
  */
 namespace hyf\jobs;
 

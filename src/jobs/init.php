@@ -3,7 +3,7 @@
  * 框架初始化
  * 支持master、worker和task进程初始化脚本
  *
- * @author Makle <zhang.tao@hylinkad.com>
+ * @author
  */
 namespace hyf\jobs;
 

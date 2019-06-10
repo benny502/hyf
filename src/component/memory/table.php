@@ -2,7 +2,7 @@
 
 /**
  * swoole memory table 
- * @author Makle
+ * @author
  *
  */
 namespace hyf\component\memory;

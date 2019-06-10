@@ -1,16 +1,16 @@
 {
-    "name": "hyf/hyf",
+    "name": "hyc/hyf",
     "description": "swoole framework, include timer, task, async, mvc",
     "type": "project",
     "authors": [
         {
-            "name": "Makle",
-            "email": "77465969@qq.com"
+            "name": "Hyf",
+            "email": "11111111@qq.com"
         }
     ],
     "minimum-stability": "dev",
     "require": {
-        "pimple/pimple": "^3.0"
+        "pimple/pimple": "3.0"
     },
     "autoload": {
         "psr-4": {
