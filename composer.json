@@ -1,7 +1,13 @@
 {
-    "name": "hy/hyf",
-    "description": "A simple swoole framework",
+    "name": "hyfs/hyf",
+    "description": "swoole framework, include timer, task, async, mvc",
     "type": "project",
+    "authors": [
+        {
+            "name": "Hyf",
+            "email": "11111111@qq.com"
+        }
+    ],
     "minimum-stability": "dev",
     "require": {
         "pimple/pimple": "3.0.0"
@@ -12,6 +18,7 @@
         },
         "classmap": [
             "src/Hyf.php"
-        ]
+        ],
+        "files":["src/function/function.php"]
     }
 }

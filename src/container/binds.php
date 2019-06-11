@@ -1,9 +1,7 @@
 <?php
 namespace hyf\container;
 
-use hyf\component\db\redis;
 use hyf\container\core\container;
-use hyf\component\db\mysql;
 use hyf\component\io\output;
 
 class binds
@@ -11,15 +9,10 @@ class binds
 
     // 默认bind列表(框架级)
     protected static $binds = [
-        'mysql' => [
-            'class' => mysql::class, 
-            'config' => 'mysql'
-        ], 
-        'mysql_slave' => [
-            'class' => mysql::class, 
-            'config' => 'mysql_slave'
-        ],
-        'redis' => redis::class,
+//        'mysql' => [
+//            'class' => mysql::class,
+//            'config' => 'mysql'
+//        ],
         'output' => output::class
     ];
 

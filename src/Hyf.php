@@ -50,6 +50,13 @@ class Hyf
     public static $response;
 
     /**
+     * 请求group名
+     *
+     * @var string
+     */
+    public static $group;
+
+    /**
      * 请求controller名
      *
      * @var string

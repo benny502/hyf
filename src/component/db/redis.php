@@ -1,7 +1,7 @@
 <?php
 namespace hyf\component\db;
 
-class redis extends \Redis
+class redis
 {
 
     public $redis;
@@ -11,11 +11,17 @@ class redis extends \Redis
         $dbConf = \Hyf::$config[$dbType];
         $this->redis = new \Redis();
         $this->redis->connect($dbConf['host'], $dbConf['port']);
-        if ($dbConf['auth']) { // 需要认证
+        if (!empty($dbConf['auth'])) { // 需要认证
             $isauth = $this->redis->auth($dbConf['password']);
             if (!$isauth) {
                 throw new \Exception('redis认证失败，请联系管理员', 401);
             }
         }
+    }
+
+
+    public function __call($name, $arguments)
+    {
+        return call_user_func_array([$this->redis, $name], $arguments);
     }
 }

@@ -87,9 +87,11 @@ class http_server
             try {
                 
                 // router
-                list($controller, $action) = \hyf\component\route\router::run();
+                list($group, $controller, $action) = \hyf\component\route\router::run();
                 \Hyf::$controller = $controller;
                 \Hyf::$action = $action;
+                \Hyf::$group = $group;
+
                 
                 // 执行应用初始化方法
                 $class_init = "\\application\\" . $config['app_name'] . "\\init\\app";
@@ -99,8 +101,12 @@ class http_server
                         $method->invoke($initialization->newInstance());
                     }
                 }
-                
-                $current_controller_class = "\\application\\" . $config['app_name'] . "\\controller\\" . \Hyf::$controller;
+
+                if (!empty($group)) {
+                    $current_controller_class = "\\application\\" . $config['app_name'] . "\\controller\\" . \Hyf::$group . '\\' .\Hyf::$controller;
+                } else {
+                    $current_controller_class = "\\application\\" . $config['app_name'] . "\\controller\\" . \Hyf::$controller;
+                }
                 $current_action = \Hyf::$action;
                 
                 if (\class_exists($current_controller_class)) {
