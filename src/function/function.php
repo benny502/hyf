@@ -97,3 +97,21 @@ function server()
 {
     return Hyf::$server;
 }
+
+/**
+ * @return string
+ */
+function version()
+{
+    return Hyf::$version;
+}
+
+/**
+ * @return string
+ */
+function rootPath()
+{
+    return Hyf::$dir;
+}
+
+
