@@ -79,7 +79,7 @@ class start
                 // 设置task async，可以使用协程等
                 $server_config['server_set']['task_async'] = true;
                 // set log file
-                $server_config['server_set']['log_file'] = \Hyf::$dir . 'log/' . $server_config['app_name'] . '_server.log';
+                $server_config['server_set']['log_file'] = logPath() . $server_config['app_name'] . '_server.log';
             }
             
             self::get_master_pid($server_config['process_name']['master']);

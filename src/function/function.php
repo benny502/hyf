@@ -114,4 +114,18 @@ function rootPath()
     return Hyf::$dir;
 }
 
+/**
+ * @return string
+ */
+function logPath()
+{
+    if (empty(Hyf::$config['log']['dir'])) {
+        $path = '/tmp/log';
+        if (!is_dir($path)) {
+            mkdir($path, 0777, true);
+        }
+        return '/tmp/log/';
+    }
 
+    return Hyf::$config['log']['dir'];
+}
