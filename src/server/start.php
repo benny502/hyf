@@ -8,38 +8,41 @@ namespace hyf\server;
 
 class start
 {
-    
+
     private static $daemonize = false;
-    
+
     private static $master_pid = '';
-    
+
     private static function parseCli()
     {
         global $argv;
-
+        
         if (!isset($argv[1]) && !isset($argv[2])) {
             exit("使用方法 php {http|timer} app_name {start|stop|killall} (-d)\n");
         }
-
+        
         if (!in_array($argv[0], [
-            'http',
+            'http', 
             'timer'
         ])) {
             exit("参数使用不正确\n");
         }
-
+        
         $conf_path = \Hyf::$dir . 'application' . '/' . $argv[1] . '/conf/server.ini';
-        if ($argv[0] != 'timer' && !file_exists($conf_path)) {
-            exit("服务器参数配置不正确\n");
-        } else {
+        
+        if (file_exists($conf_path)) {
             $server_config = parse_ini_file($conf_path, true);
+        } else {
+            if ($argv[0] == 'http') {
+                exit("服务器参数配置不正确\n");
+            }
         }
-
+        
         $server_config['app_name'] = $argv[1];
-
+        
         if (!in_array($argv[2], [
-            'start',
-            'stop',
+            'start', 
+            'stop', 
             'killall'
         ])) {
             exit("参数使用不正确\n");
@@ -49,14 +52,17 @@ class start
             self::$daemonize = true;
         }
         
-        return [$argv[2], $server_config];
+        return [
+            $argv[2], 
+            $server_config
+        ];
     }
-    
+
     private static function get_master_pid($master_name)
     {
         self::$master_pid = trim(shell_exec("pidof {$master_name}"));
     }
-    
+
     public static function run($server_type)
     {
         try {
@@ -64,14 +70,14 @@ class start
             $server_config['service_type'] = $server_type;
             if ($server_config['service_type'] == 'timer') {
                 $server_config['process_name'] = [
-                    'master' => 'hy_' . $server_config['app_name'] . '_master_worker',
-                	'worker' => 'hy_' . $server_config['app_name'] . '_worker[workerID:{id}]',
+                    'master' => 'hy_' . $server_config['app_name'] . '_master_worker', 
+                    'worker' => 'hy_' . $server_config['app_name'] . '_worker[workerID:{id}]'
                 ];
             } else {
                 $server_config['process_name'] = [
-                    'master' => 'hy_' . $server_config['app_name'] . '_master_worker',
-                    'manager' => 'hy_' . $server_config['app_name'] . '_manager_worker',
-                    'worker' => 'hy_' . $server_config['app_name'] . '_worker[workerID:{id}]',
+                    'master' => 'hy_' . $server_config['app_name'] . '_master_worker', 
+                    'manager' => 'hy_' . $server_config['app_name'] . '_manager_worker', 
+                    'worker' => 'hy_' . $server_config['app_name'] . '_worker[workerID:{id}]', 
                     'task' => 'hy_' . $server_config['app_name'] . '_task_worker[workerID:{id}]'
                 ];
                 // 抢占模式，主进程会根据Worker的忙闲状态选择投递，只会投递给处于闲置状态的Worker
@@ -104,7 +110,7 @@ EOL;
                     echo "\n服务已经启动...\nPHP版本: " . PHP_VERSION . "\nSWOOLE版本: " . swoole_version() . PHP_EOL;
                     // set daemonize
                     $server_config['server_set']['daemonize'] = self::$daemonize;
-                    if (! self::$daemonize) {
+                    if (!self::$daemonize) {
                         echo <<<EOL
 
 
@@ -115,42 +121,43 @@ EOL;
                     }
                     // 全局配置
                     \Hyf::$config = parse_ini_file(\Hyf::$dir . 'conf/base.ini', true);
+                    \Hyf::$app_name = $server_config['app_name'];
                     // start server
                     self::startService($server_config);
                 } else {
                     throw new \Exception("服务正在运行，请勿重复启动\n");
                 }
-            } elseif($action == 'stop') {
+            } elseif ($action == 'stop') {
                 if (empty(self::$master_pid)) {
                     throw new \Exception("服务尚未运行\n");
                 } else {
                     self::stopService();
                 }
-            }else{
+            } else {
                 self::killall($server_config['app_name']);
             }
         } catch (\Exception $e) {
             exit($e->getMessage());
         }
     }
-    
+
     private static function startService(array $server_config)
     {
         call_user_func_array(array(
-            '\\hyf\\server\\servers\\' . $server_config['service_type'] . '_server',
+            '\\hyf\\server\\servers\\' . $server_config['service_type'] . '_server', 
             'run'
         ), array(
             $server_config
         ));
     }
-    
+
     private static function stopService()
     {
         \system("kill -9 -" . self::$master_pid);
     }
-    
+
     private static function killall($app_name)
     {
-        \system('ps -ef|grep hy_'.$app_name.'|grep -v grep|awk \'{print "kill -9 " $2}\' |sh');
+        \system('ps -ef|grep hy_' . $app_name . '|grep -v grep|awk \'{print "kill -9 " $2}\' |sh');
     }
 }

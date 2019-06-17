@@ -1,5 +1,40 @@
 <?php
 /**
+ * 应用内跨模块/文件夹调用 
+ * 第一个参数为 类路径
+ * 后续可变参数列表陆续为 对应类的构造参数列表，如果没有构造函数，无需传入该参数
+ * @param $class
+ * @return mixed
+ */
+function hyf(...$param)
+{
+    $class = str_replace('/', '_', array_shift($param));
+    return \hyf\component\call\call::$class($param);
+}
+
+/**
+ * 应用内跨模块调用模型 默认model目录，使用方法惨开 hyf函数
+ * @param $model
+ * @return mixed
+ */
+function model(...$param)
+{
+    $class = 'model_' . str_replace('/', '_', array_shift($param));
+    return \hyf\component\call\call::$class($param);
+}
+
+/**
+ * 应用内跨模块调用模型 默认helper目录，使用方法惨开 hyf函数
+ * @param $helper
+ * @return mixed
+ */
+function helper(...$param)
+{
+    $class = 'helper_' . str_replace('/', '_', array_shift($param));
+    return \hyf\component\call\call::$class($param);
+}
+
+/**
  * @param string $config
  * @return \hyf\component\db\mysql|mixed
  * @throws \hyf\component\exception\myException
@@ -72,6 +107,11 @@ function app_config($key = '')
         return Hyf::$app_config[$key];
     }
     return Hyf::$app_config;
+}
+
+function app_name()
+{
+    return Hyf::$app_name;
 }
 
 /**

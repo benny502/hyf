@@ -29,6 +29,13 @@ class Hyf
     public static $config;
 
     /**
+     * 应用名称
+     *
+     * @var string
+     */
+    public static $app_name;
+
+    /**
      * server对象
      *
      * @var object

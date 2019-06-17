@@ -29,25 +29,21 @@ class http_server
         
         // default bind container
         \hyf\container\binds::Run();
-        
+
         // memory
         \hyf\jobs\memory::init($config['app_name']);
-        
-        // init
-        \hyf\jobs\init::map_init($config);
-        
-        // timer
-        \hyf\jobs\timer::map_timer($config);
+
+        // run master init jobs
+        \hyf\jobs\init::run($server);
+
+        // set process timer
+        \hyf\jobs\timer::run($server, $config['process_name']['manager']);
         
         // run other listen-service
         \hyf\jobs\server::run($server, $config['app_name']);
         
         $server->on('start', function ($server) use ($config) {
             swoole_set_process_name($config['process_name']['master']);
-            // run master init jobs
-            \hyf\jobs\init::run_master($server);
-            // run master timer jobs
-            \hyf\jobs\timer::run_master_timer($server);
         });
         
         $server->on('managerStart', function ($server) use ($config) {
@@ -62,15 +58,6 @@ class http_server
                 $process_name = str_replace('{id}', $worker_id, $config['process_name']['worker']);
                 swoole_set_process_name($process_name);
             }
-            
-            // run init jobs
-            if ($server->taskworker) {
-                \hyf\jobs\init::run_task($server);
-            } else {
-                \hyf\jobs\init::run_worker($server);
-            }
-            // run timer jobs
-            \hyf\jobs\timer::run_timer($server);
         });
         
         $server->on('request', function ($request, $response) use ($server, $config) {
@@ -158,9 +145,6 @@ class http_server
                 $data
             ));
         });
-        
-        // set process timer
-        \hyf\jobs\timer::run_process_timer($server, $config['process_name']['manager']);
         
         $server->start();
     }
