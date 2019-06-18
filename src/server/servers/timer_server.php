@@ -17,40 +17,49 @@ class timer_server
         }
         // master process name set
         swoole_set_process_name($config['process_name']['master']);
-        
+
+        // 获取主进程ID
+        $pid = posix_getpid();
+
         // 应用配置文件
         if (file_exists(\Hyf::$dir . 'application/' . $config['app_name'] . '/conf/app.ini')) {
             \Hyf::$app_config = parse_ini_file(\Hyf::$dir . 'application/' . $config['app_name'] . '/conf/app.ini', true) ?: [];
         } else {
             \Hyf::$app_config = [];
         }
-        
+
         // memory
         \hyf\jobs\memory::init($config['app_name']);
-        
+
         // init set
         self::init($config['app_name']);
-        
+
         // timer jobs
         $timer_array = self::timer($config);
-        
+
         if (!empty($timer_array)) {
-            
+
             $workerNum = count($timer_array);
             $pool = new \Swoole\Process\Pool($workerNum);
-            
-            $pool->on("WorkerStart", function ($pool, $worker_id) use ($config, $timer_array) {
-                
+
+            $pool->on("WorkerStart", function ($pool, $worker_id) use ($config, $timer_array, $pid) {
+
+                // 如果不存在相关定时器则报错及退出进程执行
+                if(!class_exists($timer_array[$worker_id])) {
+                    echo "Class [{$timer_array[$worker_id]}] not exists!" . PHP_EOL;
+                    \Swoole\Process::kill("-{$pid}", SIGKILL);
+                }
+
                 // job实例
                 $timer_object = new $timer_array[$worker_id]();
-                
+
                 // 构造并设置进程名称
-                $process_name = str_replace('{id}', $worker_id, $config['process_name']['worker']) . '[workerName:' . $timer_object->name . ']';
+                $process_name = str_replace('{id}', $worker_id, $config['process_name']['worker']) . '[timerName:' . $timer_object->name . ']';
                 swoole_set_process_name($process_name);
                 // echo "Worker: {$worker_id} is started\n";
-                
+
                 $last_run_time = time();
-                
+
                 // 安装定时器
                 \Swoole\Timer::tick(1000, function () use ($timer_object, &$last_run_time) {
                     $current_time = time();
@@ -63,11 +72,11 @@ class timer_server
                     }
                 });
             });
-            
+
             $pool->on("WorkerStop", function ($pool, $worker_id) {
                 // echo "Worker: {$worker_id} is stopped\n";
             });
-            
+
             $pool->start();
         }
     }
@@ -81,7 +90,7 @@ class timer_server
         if (!empty($init_array)) {
             foreach ($init_array as $init) {
                 call_user_func_array(array(
-                    new $init(), 
+                    new $init(),
                     'run'
                 ), array());
             }

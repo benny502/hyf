@@ -21,7 +21,7 @@ class mysql
     public function __construct($dbType = "mysql")
     {
         $dbConf = \Hyf::$config[$dbType];
-        $this->logfile = logPath() . 'sqlerror.log';
+        $this->logfile = log_path() . 'sqlerror.log';
         $this->dsn = "mysql:host={$dbConf['host']};port={$dbConf['port']};dbname={$dbConf['database']};";
         $this->dbuser = $dbConf['user'];
         $this->dbpass = $dbConf['password'];

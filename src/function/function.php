@@ -109,9 +109,20 @@ function app_config($key = '')
     return Hyf::$app_config;
 }
 
+/**
+ * @return string
+ */
 function app_name()
 {
     return Hyf::$app_name;
+}
+
+/**
+ * @return string
+ */
+function app_dir()
+{
+    return root_path() . 'application' . '/' . app_name() . '/';
 }
 
 /**
@@ -149,7 +160,7 @@ function version()
 /**
  * @return string
  */
-function rootPath()
+function root_path()
 {
     return Hyf::$dir;
 }
@@ -157,7 +168,7 @@ function rootPath()
 /**
  * @return string
  */
-function logPath()
+function log_path()
 {
     if (empty(Hyf::$config['log']['dir'])) {
         $path = '/tmp/log';
