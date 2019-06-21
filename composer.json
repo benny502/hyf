@@ -1,5 +1,5 @@
 {
-    "name": "hyfs/hyf",
+    "name": "hy/hyf",
     "description": "swoole framework, include timer, task, async, mvc",
     "type": "project",
     "authors": [

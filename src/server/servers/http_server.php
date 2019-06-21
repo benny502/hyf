@@ -74,7 +74,12 @@ class http_server
             try {
                 
                 // router
-                list($group, $controller, $action) = \hyf\component\route\router::run();
+                $routerHelper = '\\application\\' . app_name() . '\\helper\\router';
+                if (\class_exists($routerHelper)) {
+                    list($group, $controller, $action) = call_user_func([$routerHelper, 'run']);
+                } else {
+                    list($group, $controller, $action) = \hyf\component\route\router::run();
+                }
                 \Hyf::$controller = $controller;
                 \Hyf::$action = $action;
                 \Hyf::$group = $group;
@@ -107,7 +112,7 @@ class http_server
                     $current_controller_class = "\\application\\" . $config['app_name'] . "\\controller\\" . \Hyf::$controller;
                 }
                 $current_action = \Hyf::$action;
-                
+
                 if (\class_exists($current_controller_class)) {
                     $controller_obj = new $current_controller_class();
                     if (\method_exists($controller_obj, $current_action)) {
