@@ -5,9 +5,9 @@
  * @author
  *
  */
-namespace hyf\component\memory;
+namespace hyf\component\memory\table;
 
-class table
+class core
 {
 
     // table

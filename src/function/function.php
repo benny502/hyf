@@ -41,16 +41,10 @@ function helper(...$param)
  */
 function mysql($config = 'mysql')
 {
-    static $reg = [];
-    if (!empty($reg[$config])) {
-        return $reg[$config];
+    if (!empty(Hyf::$config[$config])) {
+        return call_user_func("\\hyf\\facade\\mysql::{$config}");
     }
-
-    if (empty(Hyf::$config[$config])) {
-        throw new \hyf\component\exception\myException("mysql配置错误!");
-    }
-
-    return $reg[$config] = new \hyf\component\db\mysql($config);
+    return NULL;
 }
 
 /**
@@ -60,16 +54,10 @@ function mysql($config = 'mysql')
  */
 function redis($config = 'redis')
 {
-    static $reg = [];
-    if (!empty($reg[$config])) {
-        return $reg[$config];
+    if (!empty(Hyf::$config[$config])) {
+        return call_user_func("\\hyf\\facade\\redis::{$config}");
     }
-
-    if (empty(Hyf::$config[$config])) {
-        throw new \hyf\component\exception\myException("redis配置错误!");
-    }
-
-    return $reg[$config] = new \hyf\component\db\redis($config);
+    return NULL;
 }
 
 /**
@@ -79,10 +67,9 @@ function redis($config = 'redis')
 function table($config = '')
 {
     if (!empty($config)) {
-        return call_user_func_array(['\hyf\facade\table', $config], []);
+        return call_user_func("\\hyf\\facade\\table::{$config}");
     }
-
-    return false;
+    return NULL;
 }
 
 /**

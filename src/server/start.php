@@ -138,7 +138,9 @@ class start
                 self::killall($server_config['app_name']);
             }
         } catch (\Exception $e) {
-            exit($e->getMessage());
+            exit("Error: \n File: {$e->getFile()} ,Line: {$e->getLine()}, Message: {$e->getMessage()}\n\n");
+        } catch (\Error $e) {
+            exit("Error: \n File: {$e->getFile()} ,Line: {$e->getLine()}, Message: {$e->getMessage()}\n\n");
         }
     }
 

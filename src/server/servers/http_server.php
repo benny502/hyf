@@ -6,8 +6,6 @@
  */
 namespace hyf\server\servers;
 
-use hyf\component\exception\myException;
-
 class http_server
 {
 
@@ -18,8 +16,8 @@ class http_server
         $server->set($config['server_set']);
         
         // 应用配置文件
-        if(file_exists(\Hyf::$dir . 'application/' . $config['app_name'] . '/conf/app.ini')) {
-            \Hyf::$app_config = parse_ini_file(\Hyf::$dir . 'application/' . $config['app_name'] . '/conf/app.ini', true) ?: [];
+        if (file_exists(app_dir() . 'conf/app.ini')) {
+            \Hyf::$app_config = parse_ini_file(app_dir() . 'conf/app.ini', true) ?: [];
         } else {
             \Hyf::$app_config = [];
         }
@@ -29,18 +27,9 @@ class http_server
         
         // default bind container
         \hyf\container\binds::Run();
-
-        // memory
-        \hyf\jobs\memory::init($config['app_name']);
-
-        // run master init jobs
-        \hyf\jobs\init::run($server);
-
-        // set process timer
-        \hyf\jobs\timer::run($server, $config['process_name']['manager']);
         
-        // run other listen-service
-        \hyf\jobs\server::run($server, $config['app_name']);
+        // init jobs
+        \hyf\init\init::Run();
         
         $server->on('start', function ($server) use ($config) {
             swoole_set_process_name($config['process_name']['master']);
@@ -60,77 +49,28 @@ class http_server
             }
         });
         
-        $server->on('request', function ($request, $response) use ($server, $config) {
+        $server->on('request', function ($request, $response) {
             
+            // 将request和response设置为全局对象
             \Hyf::$request = $request;
             \Hyf::$response = $response;
             
-            if (\Hyf::$request->server['path_info'] == '/favicon.ico' || \Hyf::$request->server['request_uri'] == '/favicon.ico') {
-                return \Hyf::$response->end();
+            // 处理非业务请求
+            if (request()->server['path_info'] == '/favicon.ico' || request()->server['request_uri'] == '/favicon.ico') {
+                return response()->end();
             }
             
-            \Hyf::$response->header("Content-Type", "application/json; charset=utf-8");
+            // 响应头
+            response()->header("Content-Type", "application/json; charset=utf-8");
             
-            try {
-                
-                // router
-                $routerHelper = '\\application\\' . app_name() . '\\helper\\router';
-                if (\class_exists($routerHelper)) {
-                    list($group, $controller, $action) = call_user_func([$routerHelper, 'run']);
-                } else {
-                    list($group, $controller, $action) = \hyf\component\route\router::run();
-                }
-                \Hyf::$controller = $controller;
-                \Hyf::$action = $action;
-                \Hyf::$group = $group;
-
-                
-                // 执行前置中间件
-                $class_init = "\\application\\" . $config['app_name'] . "\\middleware\\before";
-                if (\class_exists($class_init)) {
-                    $initialization = new \ReflectionClass($class_init);
-                    foreach ($initialization->getMethods() as $method) {
-                        // global 所有挨着执行
-                        if (strpos($method->name, 'global') !== false) {
-                            $method->invoke($initialization->newInstance());
-                        } else {
-                            if (!empty($group)) {
-                                $funName = 'router_' . \Hyf::$group . '_' . str_replace("\\", "_", \Hyf::$controller) . '_' . \Hyf::$action;
-                            } else {
-                                $funName = 'router_' . str_replace("\\", "_", \Hyf::$controller) . '_' . \Hyf::$action;
-                            }
-                            if ($method->name == $funName) {
-                                $method->invoke($initialization->newInstance());
-                            }
-                        }
-                    }
-                }
-
-                if (!empty($group)) {
-                    $current_controller_class = "\\application\\" . $config['app_name'] . "\\controller\\" . \Hyf::$group . '\\' .\Hyf::$controller;
-                } else {
-                    $current_controller_class = "\\application\\" . $config['app_name'] . "\\controller\\" . \Hyf::$controller;
-                }
-                $current_action = \Hyf::$action;
-
-                if (\class_exists($current_controller_class)) {
-                    $controller_obj = new $current_controller_class();
-                    if (\method_exists($controller_obj, $current_action)) {
-                        \Hyf::$response->end($controller_obj->$current_action());
-                    } else {
-                        throw new myException("接口地址不存在!");
-                    }
-                } else {
-                    throw new myException("接口地址不存在!");
-                }
-            } catch (myException $e) {
-                \Hyf::$response->end($e->show());
-            }
+            // http handler
+            \hyf\frame\http::Handler();
+            
         });
         
-        $server->on('task', function ($server, $task_id, $from_id, $data) use($config) {
+        $server->on('task', function ($server, $task_id, $from_id, $data) {
             call_user_func_array(array(
-                "\\application\\" . $config['app_name'] . "\\async\\async", 
+                "\\application\\" . app_name() . "\\async\\async", 
                 'task'
             ), array(
                 $server, 
@@ -140,9 +80,9 @@ class http_server
             ));
         });
         
-        $server->on('finish', function ($server, $task_id, $data) use($config) {
+        $server->on('finish', function ($server, $task_id, $data) {
             call_user_func_array(array(
-                "\\application\\" . $config['app_name'] . "\\async\\async", 
+                "\\application\\" . app_name() . "\\async\\async", 
                 'finish'
             ), array(
                 $server, 

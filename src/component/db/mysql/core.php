@@ -1,7 +1,7 @@
 <?php
-namespace hyf\component\db;
+namespace hyf\component\db\mysql;
 
-class mysql
+class core
 {
 
     public $dsn;

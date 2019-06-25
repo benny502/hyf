@@ -3,30 +3,33 @@ namespace hyf\container;
 
 use hyf\container\core\container;
 use hyf\component\io\output;
+use hyf\component\memory\table\table;
+use hyf\component\db\mysql\mysql;
+use hyf\component\db\redis\redis;
 
 class binds
 {
 
     // 默认bind列表(框架级)
     protected static $binds = [
-//        'mysql' => [
-//            'class' => mysql::class,
-//            'config' => 'mysql'
-//        ],
-        'output' => output::class
+        'http' => [
+            'table' => table::class, 
+            'output' => output::class, 
+            'mysql' => mysql::class, 
+            'redis' => redis::class
+        ], 
+        'timer' => [
+            'table' => table::class, 
+            'mysql' => mysql::class, 
+            'redis' => redis::class
+        ]
     ];
 
-    public static function Run()
+    public static function Run($type = 'http')
     {
-        foreach (self::$binds as $key => $value) {
+        foreach (self::$binds[$type] as $key => $value) {
             container::getInstance()[$key] = function () use ($value) {
-                if (!is_array($value)) {
-                    return new $value();
-                }
-                if (!isset(\Hyf::$config[$value['config']])) {
-                    return new \stdClass();
-                }
-                return new $value['class']($value['config']);
+                return new $value();
             };
         }
     }

@@ -1,20 +1,27 @@
 <?php
-namespace hyf\component\db;
+namespace hyf\component\db\redis;
 
-class redis
+class core
 {
 
     public $redis;
+    
+    public $logfile;
 
     public function __construct($dbType = "redis")
     {
         $dbConf = \Hyf::$config[$dbType];
+        $this->logfile = log_path() . 'rediserror.log';
+        
         $this->redis = new \Redis();
-        $this->redis->connect($dbConf['host'], $dbConf['port']);
+        $connect = $this->redis->connect($dbConf['host'], $dbConf['port']);
+        if(!$connect) {
+            file_put_contents($this->logfile, date('Y-m-d H:i:s') . " redis连接失败\n", FILE_APPEND | LOCK_EX);
+        }
         if (!empty($dbConf['auth'])) { // 需要认证
             $isauth = $this->redis->auth($dbConf['password']);
             if (!$isauth) {
-                throw new \Exception('redis认证失败，请联系管理员', 401);
+                file_put_contents($this->logfile, date('Y-m-d H:i:s') . " redis认证失败\n", FILE_APPEND | LOCK_EX);
             }
         }
     }

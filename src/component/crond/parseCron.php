@@ -23,7 +23,7 @@ class parseCron
      *            timestamp [default=current timestamp]
      * @param int $last_run_time
      *            timestamp [default=null timestamp]
-     * @return int unix timestamp 当前分钟内是否需要执行任务，返回需要执行任务的秒[数组]
+     * @return array unix timestamp 当前分钟内是否需要执行任务，返回需要执行任务的秒[数组]
      */
     public static function Run($crontab_string, $start_time = null, $last_run_time = null)
     {
