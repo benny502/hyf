@@ -6,11 +6,11 @@ class output
 
     public function success($data)
     {
-        return '{"code": 0, "msg": "ok", "data": ' . json_encode($data) . '}';
+        return '{"ret": 0, "msg": "ok", "data": ' . json_encode($data) . '}';
     }
 
-    public function error($msg, $data = [])
+    public function error($msg, $code = 1, $data = [])
     {
-        return '{"code": 0, "msg": "' . $msg . '", "data": ' . json_encode($data) . '}';
+        return '{"ret": ' . $code . ', "msg": "' . $msg . '", "data": ' . json_encode($data) . '}';
     }
 }

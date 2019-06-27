@@ -1,8 +1,12 @@
 <?php
 namespace hyf\component\route;
 
+use hyf\component\exception\myException;
+
 /**
- * 修改自 Macaw 类，版本归 Macaw 所有
+ * 修改自 Macaw 类
+ * 添加对组、组中间件和中间件的支持
+ * 修改直接输出方式为return返回方式
  *
  * @method static routerHandler get(string $route, Callable $callback)
  * @method static routerHandler post(string $route, Callable $callback)
@@ -34,6 +38,31 @@ class routerHandler
 
     public static $error_callback;
 
+    public static $group = '';
+
+    public static $group_middleware = null;
+
+    public static function group(...$params)
+    {
+        $uri = $params[0];
+        if (count($params) == 2) {
+            $middleware = null;
+            $callback = $params[1];
+        } elseif (count($params) == 3) {
+            $middleware = $params[1];
+            $callback = $params[2];
+        }
+        self::$group = rtrim((strpos($uri, '/') === 0 ? $uri : '/' . $uri), '/');
+        if (is_object($middleware) || is_null($middleware)) {
+            self::$group_middleware = $middleware;
+        } else {
+            self::$group_middleware = "\\application\\" . app_name() . "\\middleware\\" . $middleware;
+        }
+        $callback(self::class);
+        self::$group = '';
+        self::$group_middleware = null;
+    }
+
     /**
      * Defines a route w/ callback and method
      */
@@ -63,12 +92,18 @@ class routerHandler
         }
         
         array_push(self::$maps, $maps);
-        array_push(self::$routes, $uri);
+        array_push(self::$routes, self::$group . $uri);
         array_push(self::$methods, strtoupper($method));
         if (is_object($middleware) || is_null($middleware)) {
-            array_push(self::$middleware, $middleware);
+            array_push(self::$middleware, [
+                self::$group_middleware, 
+                $middleware
+            ]);
         } else {
-            array_push(self::$middleware, "\\application\\" . app_name() . "\\middleware\\" . $middleware);
+            array_push(self::$middleware, [
+                self::$group_middleware, 
+                "\\application\\" . app_name() . "\\middleware\\" . $middleware
+            ]);
         }
         if (is_object($callback)) {
             array_push(self::$callbacks, $callback);
@@ -113,26 +148,27 @@ class routerHandler
                 // Using an ANY option to match both GET and POST requests
                 if (self::$methods[$route] == $method || self::$methods[$route] == 'ANY' || (!empty(self::$maps[$route]) && in_array($method, self::$maps[$route]))) {
                     $found_route = true;
-                    
-                    if (self::$middleware[$route] != null) {
-                        if (!is_object(self::$middleware[$route])) {
-                            // Grab all parts based on a / separator
-                            $parts_m = explode('/', self::$middleware[$route]);
-                            
-                            // Collect the last index of the array
-                            $last_m = end($parts_m);
-                            
-                            // Grab the controller name and method call
-                            $segments_m = explode('@', $last_m);
-                            
-                            // Instanitate controller
-                            $controller_m = new $segments_m[0]();
-                            
-                            // Call method
-                            $controller_m->{$segments_m[1]}();
-                        } else {
-                            // Call closure
-                            call_user_func(self::$middleware[$route]);
+                    foreach (self::$middleware[$route] as $middleware) {
+                        if ($middleware != null) {
+                            if (!is_object($middleware)) {
+                                // Grab all parts based on a / separator
+                                $parts_m = explode('/', $middleware);
+                                
+                                // Collect the last index of the array
+                                $last_m = end($parts_m);
+                                
+                                // Grab the controller name and method call
+                                $segments_m = explode('@', $last_m);
+                                
+                                // Instanitate controller
+                                $controller_m = new $segments_m[0]();
+                                
+                                // Call method
+                                $controller_m->{$segments_m[1]}();
+                            } else {
+                                // Call closure
+                                call_user_func($middleware);
+                            }
                         }
                     }
                     
@@ -179,26 +215,27 @@ class routerHandler
                         
                         // Remove $matched[0] as [1] is the first parameter.
                         array_shift($matched);
-                        
-                        if (self::$middleware[$pos] != null) {
-                            if (!is_object(self::$middleware[$pos])) {
-                                // Grab all parts based on a / separator
-                                $parts_m = explode('/', self::$middleware[$pos]);
-                                
-                                // Collect the last index of the array
-                                $last_m = end($parts_m);
-                                
-                                // Grab the controller name and method call
-                                $segments_m = explode('@', $last_m);
-                                
-                                // Instanitate controller
-                                $controller_m = new $segments_m[0]();
-                                
-                                // Call method
-                                $controller_m->{$segments_m[1]}();
-                            } else {
-                                // Call closure
-                                call_user_func(self::$middleware[$pos]);
+                        foreach (self::$middleware[$pos] as $middleware) {
+                            if ($middleware != null) {
+                                if (!is_object($middleware)) {
+                                    // Grab all parts based on a / separator
+                                    $parts_m = explode('/', $middleware);
+                                    
+                                    // Collect the last index of the array
+                                    $last_m = end($parts_m);
+                                    
+                                    // Grab the controller name and method call
+                                    $segments_m = explode('@', $last_m);
+                                    
+                                    // Instanitate controller
+                                    $controller_m = new $segments_m[0]();
+                                    
+                                    // Call method
+                                    $controller_m->{$segments_m[1]}();
+                                } else {
+                                    // Call closure
+                                    call_user_func($middleware);
+                                }
                             }
                         }
                         
@@ -218,11 +255,7 @@ class routerHandler
                             
                             // Fix multi parameters
                             if (!method_exists($controller, $segments[1])) {
-                                return json_encode([
-                                    " ret " => 1, 
-                                    " msg " => " controller and action not fou nd", 
-                                    "da ta" => []
-                                ]);
+                                throw new myException("controller and action not found");
                             } else {
                                 return call_user_func_array(array(
                                     $controller, 
@@ -248,11 +281,7 @@ class routerHandler
         if ($found_route == false) {
             if (!self::$error_callback) {
                 self::$error_callback = function () {
-                    return json_encode([
-                        "r et" => 1, 
-                        "m sg" => "404 Not F ound", 
-                        " data" => []
-                    ]);
+                    throw new myException("404 Not Found");
                 };
             } else {
                 if (is_string(self::$error_callback)) {

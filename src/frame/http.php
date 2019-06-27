@@ -18,7 +18,7 @@ class http
             // 处理路由
             switch ($mode) {
                 case 'handler':
-                    $routerHandler = "\\application\\" . app_name() . "\\route\\handler";
+                    $routerHandler = "\\application\\" . app_name() . "\\route\\router";
                     $result = $routerHandler::Run(routerHandler::class);
                     response()->end($result);
                     break;
@@ -37,7 +37,7 @@ class http
     {
         // 自定义解析过程
         $ret = [];
-        $routerHelper = '\\application\\' . app_name() . '\\route\\router';
+        $routerHelper = '\\application\\' . app_name() . '\\route\\dispatch';
         if (\class_exists($routerHelper)) {
             $ret = $routerHelper::run();
         } else {

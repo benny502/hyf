@@ -16,25 +16,25 @@ class start
     private static function parseCli()
     {
         global $argv;
-
+        
         if (!isset($argv[1]) && !isset($argv[2])) {
             exit("使用方法 php {http|timer} app_name {start|stop|killall} (-d)\n");
         }
-
+        
         //
         $program = explode("/", $argv[0]);
         $argv[0] = array_pop($program);
         unset($program);
-
+        
         if (!in_array($argv[0], [
-            'http',
+            'http', 
             'timer'
         ])) {
             exit("参数使用不正确\n");
         }
-
+        
         $conf_path = \Hyf::$dir . 'application' . '/' . $argv[1] . '/conf/server.ini';
-
+        
         if (file_exists($conf_path)) {
             $server_config = parse_ini_file($conf_path, true);
         } else {
@@ -42,23 +42,23 @@ class start
                 exit("服务器参数配置不正确\n");
             }
         }
-
+        
         $server_config['app_name'] = $argv[1];
-
+        
         if (!in_array($argv[2], [
-            'start',
-            'stop',
+            'start', 
+            'stop', 
             'killall'
         ])) {
             exit("参数使用不正确\n");
         }
-
+        
         if (isset($argv[3]) && $argv[3] == '-d') {
             self::$daemonize = true;
         }
-
+        
         return [
-            $argv[2],
+            $argv[2], 
             $server_config
         ];
     }
@@ -75,14 +75,14 @@ class start
             $server_config['service_type'] = $server_type;
             if ($server_config['service_type'] == 'timer') {
                 $server_config['process_name'] = [
-                    'master' => 'hy_' . $server_config['app_name'] . '_master_worker',
+                    'master' => 'hy_' . $server_config['app_name'] . '_master_worker', 
                     'worker' => 'hy_' . $server_config['app_name'] . '_worker[workerID:{id}]'
                 ];
             } else {
                 $server_config['process_name'] = [
-                    'master' => 'hy_' . $server_config['app_name'] . '_master_worker',
-                    'manager' => 'hy_' . $server_config['app_name'] . '_manager_worker',
-                    'worker' => 'hy_' . $server_config['app_name'] . '_worker[workerID:{id}]',
+                    'master' => 'hy_' . $server_config['app_name'] . '_master_worker', 
+                    'manager' => 'hy_' . $server_config['app_name'] . '_manager_worker', 
+                    'worker' => 'hy_' . $server_config['app_name'] . '_worker[workerID:{id}]', 
                     'task' => 'hy_' . $server_config['app_name'] . '_task_worker[workerID:{id}]'
                 ];
                 // 抢占模式，主进程会根据Worker的忙闲状态选择投递，只会投递给处于闲置状态的Worker
@@ -92,71 +92,71 @@ class start
                 // set log file
                 $server_config['server_set']['log_file'] = log_path() . $server_config['app_name'] . '_server.log';
             }
-
+            
             self::get_master_pid($server_config['process_name']['master']);
-
+            
             if ($action == 'start') {
-                if (empty(self::$master_pid)) {
-                    echo "\n";
-                    echo "\033[0;42;37m***************************************************************\033[0m\n";
-                    echo "\033[0;42;37m*                                                             *\033[0m\n";
-                    echo "\033[0;42;37m*           __             _____             __               *\033[0m\n";
-                    echo "\033[0;42;37m*          / /            / ___/            / /               *\033[0m\n";
-                    echo "\033[0;42;37m*         / /_  __   __  / /__     ____    / /_    ____       *\033[0m\n";
-                    echo "\033[0;42;37m*        / __ \ \ \ / / / .__/    / __ \  / __ \  / __ \      *\033[0m\n";
-                    echo "\033[0;42;37m*       / / / /  \_/ / / /       / /_/ / / / / / / /_/ /      *\033[0m\n";
-                    echo "\033[0;42;37m*      /_/ /_/    / / /_/       / .___/ /_/ /_/ / .___/       *\033[0m\n";
-                    echo "\033[0;42;37m*               _/_/           /_/             /_/            *\033[0m\n";
-                    echo "\033[0;42;37m*                                                             *\033[0m\n";
-                    echo "\033[0;42;37m*                                                             *\033[0m\n";
-                    echo "\033[0;42;37m***************************************************************\033[0m\n";
-                    echo "\n服务已经正常启动...";
-                    echo "\nphp版本: \033[32m" . PHP_VERSION . "\033[0m";
-                    echo "\nswoole版本: \033[32m" . swoole_version() . "\033[0m";
-                    echo "\nhyf版本: \033[32m" . version() . "\033[0m";
-
-                    // set daemonize
-                    $server_config['server_set']['daemonize'] = self::$daemonize;
-                    if (!self::$daemonize) {
-                        echo "\n\n\033[0;33m***************************调试模式****************************\033[0m\n\n";
-                    }
-                    // 全局配置
-                    \Hyf::$config = parse_ini_file(\Hyf::$dir . 'conf/base.ini', true);
-                    \Hyf::$app_name = $server_config['app_name'];
-                    // start server
-                    self::startService($server_config);
-                } else {
-                    throw new \Exception("服务正在运行，请勿重复启动\n");
-                }
+                self::startService($server_config);
             } elseif ($action == 'stop') {
-                if (empty(self::$master_pid)) {
-                    throw new \Exception("服务尚未运行\n");
-                } else {
-                    self::stopService();
-                }
+                self::stopService();
             } else {
                 self::killall($server_config['app_name']);
             }
         } catch (\Exception $e) {
-            exit("Error: \n File: {$e->getFile()} ,Line: {$e->getLine()}, Message: {$e->getMessage()}\n\n");
+            exit("Error: \n File: {$e->getFile()} ,Line: {$e->getLine()}, Message: {$e->getMessage()}\n");
         } catch (\Error $e) {
-            exit("Error: \n File: {$e->getFile()} ,Line: {$e->getLine()}, Message: {$e->getMessage()}\n\n");
+            exit("Error: \n File: {$e->getFile()} ,Line: {$e->getLine()}, Message: {$e->getMessage()}\n");
         }
     }
 
     private static function startService(array $server_config)
     {
-        call_user_func_array(array(
-            '\\hyf\\server\\servers\\' . $server_config['service_type'] . '_server',
-            'run'
-        ), array(
-            $server_config
-        ));
+        if (empty(self::$master_pid)) {
+            echo "\n";
+            echo "\033[0;42;37m***************************************************************\033[0m\n";
+            echo "\033[0;42;37m*                                                             *\033[0m\n";
+            echo "\033[0;42;37m*           __             _____             __               *\033[0m\n";
+            echo "\033[0;42;37m*          / /            / ___/            / /               *\033[0m\n";
+            echo "\033[0;42;37m*         / /_  __   __  / /__     ____    / /_    ____       *\033[0m\n";
+            echo "\033[0;42;37m*        / __ \ \ \ / / / .__/    / __ \  / __ \  / __ \      *\033[0m\n";
+            echo "\033[0;42;37m*       / / / /  \_/ / / /       / /_/ / / / / / / /_/ /      *\033[0m\n";
+            echo "\033[0;42;37m*      /_/ /_/    / / /_/       / .___/ /_/ /_/ / .___/       *\033[0m\n";
+            echo "\033[0;42;37m*               _/_/           /_/             /_/            *\033[0m\n";
+            echo "\033[0;42;37m*                                                             *\033[0m\n";
+            echo "\033[0;42;37m*                                                             *\033[0m\n";
+            echo "\033[0;42;37m***************************************************************\033[0m\n";
+            echo "\n服务已经正常启动...";
+            echo "\nphp版本: \033[32m" . PHP_VERSION . "\033[0m";
+            echo "\nswoole版本: \033[32m" . swoole_version() . "\033[0m";
+            echo "\nhyf版本: \033[32m" . version() . "\033[0m\n\n";
+            
+            // set daemonize
+            $server_config['server_set']['daemonize'] = self::$daemonize;
+            if (!self::$daemonize) {
+                echo "\n\n\033[0;33m***************************调试模式****************************\033[0m\n\n";
+            }
+            // 全局配置
+            \Hyf::$config = parse_ini_file(\Hyf::$dir . 'conf/base.ini', true);
+            \Hyf::$app_name = $server_config['app_name'];
+            // start server
+            call_user_func_array(array(
+                '\\hyf\\server\\servers\\' . $server_config['service_type'] . '_server', 
+                'run'
+            ), array(
+                $server_config
+            ));
+        } else {
+            throw new \Exception("服务正在运行，请勿重复启动\n");
+        }
     }
 
     private static function stopService()
     {
-        \system("kill -9 -" . self::$master_pid);
+        if (empty(self::$master_pid)) {
+            throw new \Exception("服务尚未运行\n");
+        } else {
+            \system("kill -9 -" . self::$master_pid);
+        }
     }
 
     private static function killall($app_name)
