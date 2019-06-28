@@ -1,6 +1,7 @@
 <?php
 namespace hyf\init;
 
+use hyf\init\job\table;
 use hyf\init\job\start;
 use hyf\init\job\timer;
 use hyf\init\job\server;
@@ -10,11 +11,13 @@ class init
 {
     protected static $init = [
         'http' => [
+            table::class,
             start::class,
             timer::class,
             server::class
         ],
         'timer' => [
+            table::class,
             start::class,
             timerPool::class
         ]
