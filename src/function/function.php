@@ -1,4 +1,5 @@
 <?php
+
 /**
  * 应用内跨模块/文件夹调用 
  * 第一个参数为 类路径
@@ -14,7 +15,9 @@ function hyf(...$param)
 
 /**
  * 应用内跨模块调用模型 默认model目录，使用方法惨开 hyf函数
- * @param $model
+ *
+ * @param
+ *            $model
  * @return mixed
  */
 function model(...$param)
@@ -25,7 +28,9 @@ function model(...$param)
 
 /**
  * 应用内跨模块调用模型 默认helper目录，使用方法惨开 hyf函数
- * @param $helper
+ *
+ * @param
+ *            $helper
  * @return mixed
  */
 function helper(...$param)
@@ -35,7 +40,8 @@ function helper(...$param)
 }
 
 /**
- * @param string $config
+ *
+ * @param string $config            
  * @return \hyf\component\db\mysql|mixed
  * @throws \hyf\component\exception\myException
  */
@@ -48,7 +54,8 @@ function mysql($config = 'mysql')
 }
 
 /**
- * @param string $config
+ *
+ * @param string $config            
  * @return \hyf\component\db\redis|mixed
  * @throws \hyf\component\exception\myException
  */
@@ -61,7 +68,8 @@ function redis($config = 'redis')
 }
 
 /**
- * @param string $config
+ *
+ * @param string $config            
  * @return bool|mixed
  */
 function table($config = '')
@@ -73,7 +81,8 @@ function table($config = '')
 }
 
 /**
- * @param string $key
+ *
+ * @param string $key            
  * @return array
  */
 function config($key = '')
@@ -85,7 +94,8 @@ function config($key = '')
 }
 
 /**
- * @param string $key
+ *
+ * @param string $key            
  * @return array
  */
 function app_config($key = '')
@@ -97,6 +107,7 @@ function app_config($key = '')
 }
 
 /**
+ *
  * @return string
  */
 function app_name()
@@ -105,6 +116,7 @@ function app_name()
 }
 
 /**
+ *
  * @return string
  */
 function app_dir()
@@ -113,6 +125,7 @@ function app_dir()
 }
 
 /**
+ *
  * @return object
  */
 function request()
@@ -121,6 +134,7 @@ function request()
 }
 
 /**
+ *
  * @return object
  */
 function response()
@@ -129,6 +143,7 @@ function response()
 }
 
 /**
+ *
  * @return object
  */
 function server()
@@ -137,6 +152,7 @@ function server()
 }
 
 /**
+ *
  * @return string
  */
 function version()
@@ -145,6 +161,7 @@ function version()
 }
 
 /**
+ *
  * @return string
  */
 function root_path()
@@ -153,6 +170,7 @@ function root_path()
 }
 
 /**
+ *
  * @return string
  */
 function log_path()
@@ -164,6 +182,25 @@ function log_path()
         }
         return '/tmp/log/';
     }
-
+    
     return Hyf::$config['log']['dir'];
 }
+
+/**
+ * 容器快速调用方法
+ * exmple: 
+ *  DI('user', function(){ ...}); 
+ *  DI('name', 'abcdefg');
+ */
+function DI(...$params)
+{
+    if (count($params) == 1 && \hyf\container\core\container::getInstance()->offsetExists($params[0])) {
+        return \hyf\container\core\container::getInstance()[$params[0]];
+    } elseif (count($params) == 2) {
+        \hyf\container\core\container::getInstance()->offsetUnset($params[0]);
+        \hyf\container\core\container::getInstance()[$params[0]] = $params[1];
+    } else {
+        return '';
+    }
+}
+

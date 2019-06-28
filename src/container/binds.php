@@ -28,7 +28,7 @@ class binds
     public static function Run($type = 'http')
     {
         foreach (self::$binds[$type] as $key => $value) {
-            container::getInstance()[$key] = function () use ($value) {
+            container::getInstance()[md5($key)] = function () use ($value) {
                 return new $value();
             };
         }
