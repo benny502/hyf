@@ -75,15 +75,17 @@ class start
             $server_config['service_type'] = $server_type;
             if ($server_config['service_type'] == 'timer') {
                 $server_config['process_name'] = [
-                    'master' => 'hy_' . $server_config['app_name'] . '_master_worker', 
-                    'worker' => 'hy_' . $server_config['app_name'] . '_worker[workerID:{id}]'
+                    'base' => 'hy_' . $server_config['app_name'],
+                    'master' => 'hy_' . $server_config['app_name'] . '_master', 
+                    'worker' => 'hy_' . $server_config['app_name'] . '_worker[{id}]'
                 ];
             } else {
                 $server_config['process_name'] = [
-                    'master' => 'hy_' . $server_config['app_name'] . '_master_worker', 
-                    'manager' => 'hy_' . $server_config['app_name'] . '_manager_worker', 
-                    'worker' => 'hy_' . $server_config['app_name'] . '_worker[workerID:{id}]', 
-                    'task' => 'hy_' . $server_config['app_name'] . '_task_worker[workerID:{id}]'
+                    'base' => 'hy_' . $server_config['app_name'],
+                    'master' => 'hy_' . $server_config['app_name'] . '_master', 
+                    'manager' => 'hy_' . $server_config['app_name'] . '_manager', 
+                    'worker' => 'hy_' . $server_config['app_name'] . '_worker[{id}]', 
+                    'task' => 'hy_' . $server_config['app_name'] . '_task[{id}]'
                 ];
                 // 抢占模式，主进程会根据Worker的忙闲状态选择投递，只会投递给处于闲置状态的Worker
                 $server_config['server_set']['dispatch_mode'] = 3;
@@ -138,6 +140,7 @@ class start
             // 全局配置
             \Hyf::$config = parse_ini_file(\Hyf::$dir . 'conf/base.ini', true);
             \Hyf::$app_name = $server_config['app_name'];
+            \Hyf::$server_config = $server_config;
             // start server
             call_user_func_array(array(
                 '\\hyf\\server\\servers\\' . $server_config['service_type'] . '_server', 

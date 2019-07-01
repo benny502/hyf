@@ -12,7 +12,7 @@ class Hyf
      *
      * @var string
      */
-    public static $version = "2.1.6";
+    public static $version = "2.1.7";
     
     /**
      * 系统主路径
@@ -35,6 +35,13 @@ class Hyf
      */
     public static $app_name;
 
+    /**
+     * server配置文件
+     *
+     * @var array
+     */
+    public static $server_config;
+    
     /**
      * server对象
      *

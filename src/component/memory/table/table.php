@@ -1,26 +1,16 @@
 <?php
 namespace hyf\component\memory\table;
 
-use hyf\component\memory\table\core;
-
 class table
 {
 
-    public function __construct()
-    {
-        $class = "\\application\\" . app_name() . "\\conf\\table";
-        if (class_exists($class) && !empty($class::$column)) {
-            foreach ($class::$column as $key => $value) {
-                $this->$key = new core($value);
-            }
-        }
-    }
+    public static $table = [];
 
-    public function __call($method, $args)
+    public static function __callStatic($method, $args)
     {
-        if (!isset($this->$method)) {
+        if (!isset(self::$table[$method])) {
             return NULL;
         }
-        return $this->$method;
+        return self::$table[$method];
     }
 }

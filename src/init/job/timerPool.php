@@ -40,7 +40,7 @@ class timerPool
             $timer_object = new $timer_array[$worker_id]();
             
             // 构造并设置进程名称
-            $process_name = str_replace('{id}', $worker_id, 'hy_' . app_name() . '_worker[workerID:{id}] [timerName:' . $timer_object->name . ']');
+            $process_name = str_replace('{id}', $worker_id, server_config('process_name')['base'] . '_timer[{id}][' . $timer_object->name . ']');
             swoole_set_process_name($process_name);
             // echo "Worker: {$worker_id} is started\n";
             

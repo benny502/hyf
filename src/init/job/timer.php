@@ -28,7 +28,7 @@ class timer
                 // 创建子进程处理定时器
                 $process = new \Swoole\Process(function ($process) use ($timer) {
                     $timer_object = new $timer();
-                    swoole_set_process_name('hy_' . app_name() . '_timer_process [Name:' . $timer_object->name . ']');
+                    swoole_set_process_name(server_config('process_name')['base'] . '_timer[' . $process->id . '][' . $timer_object->name . ']');
                     $last_run_time_process = time();
                     
                     \Swoole\Timer::tick(1000, function () use ($timer_object, &$last_run_time_process) {

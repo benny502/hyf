@@ -75,7 +75,20 @@ function redis($config = 'redis')
 function table($config = '')
 {
     if (!empty($config)) {
-        return call_user_func("\\hyf\\facade\\table::{$config}");
+        return call_user_func("\\hyf\\component\\memory\\table\\table::{$config}");
+    }
+    return NULL;
+}
+
+/**
+ *
+ * @param string $config            
+ * @return bool|mixed
+ */
+function queue($config = '')
+{
+    if (!empty($config)) {
+        return call_user_func("\\hyf\\component\\memory\\queue\\queue::{$config}");
     }
     return NULL;
 }
@@ -104,6 +117,19 @@ function app_config($key = '')
         return Hyf::$app_config[$key];
     }
     return Hyf::$app_config;
+}
+
+/**
+ *
+ * @param string $key
+ * @return array
+ */
+function server_config($key = '')
+{
+    if (!empty($key)) {
+        return Hyf::$server_config[$key];
+    }
+    return Hyf::$server_config;
 }
 
 /**
