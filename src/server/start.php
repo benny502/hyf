@@ -141,6 +141,12 @@ class start
             \Hyf::$config = parse_ini_file(\Hyf::$dir . 'conf/base.ini', true);
             \Hyf::$app_name = $server_config['app_name'];
             \Hyf::$server_config = $server_config;
+            
+            // 一键php原生语句协程化
+            if(isset($server_config['enableCoroutine']) && $server_config['enableCoroutine'] == 1) {
+                \Swoole\Runtime::enableCoroutine(true);
+            }
+            
             // start server
             call_user_func_array(array(
                 '\\hyf\\server\\servers\\' . $server_config['service_type'] . '_server', 
