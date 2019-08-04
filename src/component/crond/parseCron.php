@@ -79,7 +79,7 @@ class parseCron
                     $each_second = $timest[1] * 7 * 24 * 60 * 60;
                     break;
             }
-            if ($last_run_time + $each_second == $start_time) {
+            if ($last_run_time + $each_second <= $start_time) {
                 return [
                     intval(date("s", $start_time)) => intval(date("s", $start_time))
                 ];
