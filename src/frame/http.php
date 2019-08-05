@@ -53,6 +53,7 @@ class http
         } finally {
             // response end
             response()->end($result);
+            middleware::after();
         }
     }
 
@@ -98,7 +99,6 @@ class http
             $controller_obj = new $current_controller_class();
             if (\method_exists($controller_obj, $current_action)) {
                 $result = $controller_obj->$current_action();
-		        middleware::after();
             } else {
                 throw new \Exception("接口地址不存在!");
             }
