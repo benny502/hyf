@@ -32,6 +32,8 @@ class http
                 case 'normal':
                 case 'group':
                     self::routerParse($mode);
+                    // 执行前置中间件
+                    middleware::before();
                     $result = self::appRun();
                     break;
                 default:
@@ -53,7 +55,10 @@ class http
         } finally {
             // response end
             response()->end($result);
-            middleware::after();
+            if ($mode != 'handle') {
+                // 执行后置中间件
+                middleware::after();
+            }
         }
     }
 
@@ -85,8 +90,6 @@ class http
 
     public static function appRun()
     {
-        // 执行前置中间件
-        middleware::before();
 
         if (!empty(\Hyf::$group)) {
             $current_controller_class = "\\application\\" . app_name() . "\\controller\\" . \Hyf::$group . '\\' . \Hyf::$controller;

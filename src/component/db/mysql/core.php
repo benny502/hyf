@@ -27,6 +27,10 @@ class core
         $this->dbpass = $dbConf['password'];
         $this->timeout = $dbConf['timeout'];
         $this->connect();
+        if (!empty($dbConf['strict'])) {
+            $this->dbh->setAttribute(\PDO::ATTR_STRINGIFY_FETCHES, false);
+            $this->dbh->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
+        }
         $this->dbh->query('SET NAMES ' . $dbConf['charset']);
     }
 
