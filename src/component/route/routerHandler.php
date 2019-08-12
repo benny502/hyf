@@ -1,8 +1,6 @@
 <?php
 namespace hyf\component\route;
 
-use hyf\component\exception\myException;
-
 /**
  * 修改自 Macaw 类
  * 添加对组、组中间件和中间件的支持
@@ -255,7 +253,7 @@ class routerHandler
                             
                             // Fix multi parameters
                             if (!method_exists($controller, $segments[1])) {
-                                throw new myException("controller and action not found");
+                                throw new \Exception("controller and action not found");
                             } else {
                                 return call_user_func_array(array(
                                     $controller, 
@@ -281,7 +279,7 @@ class routerHandler
         if ($found_route == false) {
             if (!self::$error_callback) {
                 self::$error_callback = function () {
-                    throw new myException("404 Not Found");
+                    throw new \Exception("404 Not Found");
                 };
             } else {
                 if (is_string(self::$error_callback)) {

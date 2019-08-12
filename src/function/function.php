@@ -43,7 +43,6 @@ function helper(...$param)
  *
  * @param string $config            
  * @return \hyf\component\db\mysql|mixed
- * @throws \hyf\component\exception\myException
  */
 function mysql($config = 'mysql')
 {
@@ -57,7 +56,6 @@ function mysql($config = 'mysql')
  *
  * @param string $config            
  * @return \hyf\component\db\redis|mixed
- * @throws \hyf\component\exception\myException
  */
 function redis($config = 'redis')
 {
