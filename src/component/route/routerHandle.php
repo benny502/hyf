@@ -6,14 +6,14 @@ namespace hyf\component\route;
  * 添加对组、组中间件和中间件的支持
  * 修改直接输出方式为return返回方式
  *
- * @method static routerHandler get(string $route, Callable $callback)
- * @method static routerHandler post(string $route, Callable $callback)
- * @method static routerHandler put(string $route, Callable $callback)
- * @method static routerHandler delete(string $route, Callable $callback)
- * @method static routerHandler options(string $route, Callable $callback)
- * @method static routerHandler head(string $route, Callable $callback)
+ * @method static routerHandle get(string $route, Callable $callback)
+ * @method static routerHandle post(string $route, Callable $callback)
+ * @method static routerHandle put(string $route, Callable $callback)
+ * @method static routerHandle delete(string $route, Callable $callback)
+ * @method static routerHandle options(string $route, Callable $callback)
+ * @method static routerHandle head(string $route, Callable $callback)
  */
-class routerHandler
+class routerHandle
 {
 
     public static $halts = false;

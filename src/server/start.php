@@ -33,10 +33,10 @@ class start
             exit("参数使用不正确\n");
         }
         
-        $conf_path = \Hyf::$dir . 'application' . '/' . $argv[1] . '/conf/server.ini';
+        $conf_path = \Hyf::$dir . 'application' . '/' . $argv[1] . '/conf/server.php';
         
         if (file_exists($conf_path)) {
-            $server_config = parse_ini_file($conf_path, true);
+            $server_config = include($conf_path);
         } else {
             if ($argv[0] == 'http') {
                 exit("服务器参数配置不正确\n");
@@ -138,7 +138,7 @@ class start
                 echo "\n\n\033[0;33m***************************调试模式****************************\033[0m\n\n";
             }
             // 全局配置
-            \Hyf::$config = parse_ini_file(\Hyf::$dir . 'conf/base.ini', true);
+            \Hyf::$config = include(\Hyf::$dir . 'conf/base.php');
             \Hyf::$app_name = $server_config['app_name'];
             \Hyf::$server_config = $server_config;
             

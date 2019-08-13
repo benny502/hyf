@@ -17,7 +17,7 @@ class http_server
         
         // 应用配置文件
         if (file_exists(app_dir() . 'conf/app.ini')) {
-            \Hyf::$app_config = parse_ini_file(app_dir() . 'conf/app.ini', true) ?: [];
+            \Hyf::$app_config = include(app_dir() . 'conf/app.php') ?: [];
         } else {
             \Hyf::$app_config = [];
         }
@@ -63,8 +63,8 @@ class http_server
             // 响应头
             response()->header("Content-Type", "application/json; charset=utf-8");
             
-            // http handler
-            \hyf\frame\http::Handler();
+            // http handle
+            \hyf\frame\http::Handle();
             
         });
         
