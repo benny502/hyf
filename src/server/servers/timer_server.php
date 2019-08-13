@@ -19,7 +19,7 @@ class timer_server
         swoole_set_process_name($config['process_name']['master']);
         
         // 应用配置文件
-        if (file_exists(app_dir() . 'conf/app.ini')) {
+        if (file_exists(app_dir() . 'conf/app.php')) {
             \Hyf::$app_config = include(app_dir() . 'conf/app.php') ?: [];
         } else {
             \Hyf::$app_config = [];

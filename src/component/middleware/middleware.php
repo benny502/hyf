@@ -4,7 +4,7 @@ namespace hyf\component\middleware;
 class middleware
 {
 
-    public function before()
+    public static function before()
     {
         $class_init = "\\application\\" . app_name() . "\\middleware\\before";
         if (\class_exists($class_init)) {
@@ -27,7 +27,7 @@ class middleware
         }
     }
 
-    public function after()
+    public static function after()
     {
         // 执行后置中间件
         $class_init = "\\application\\" . app_name() . "\\middleware\\after";

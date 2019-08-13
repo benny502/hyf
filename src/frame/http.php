@@ -1,7 +1,7 @@
 <?php
 namespace hyf\frame;
 
-use hyf\facade\middleware;
+use hyf\component\middleware\middleware;
 use hyf\facade\output;
 use hyf\component\route\routerHandle;
 use hyf\component\route\routerNormal;
