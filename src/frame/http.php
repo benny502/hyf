@@ -28,28 +28,32 @@ class http
                 case 'handle':
                     $routerHandler = "\\application\\" . app_name() . "\\route\\router";
                     $result = $routerHandler::Run(routerHandle::class);
-                    response()->end($result);
                     break;
                 case 'normal':
                 case 'group':
                     self::routerParse($mode);
-                    self::appRun();
+                    $result = self::appRun();
                     break;
+                default:
+                    throw new \Exception("路由模式错误!");
             }
+
         } catch (\Exception $e) {
             if (method_exists(DI("errorHook"), 'exceptionHook')) {
                 $result = DI("errorHook")->exceptionHook($e);
             } else {
                 $result = output::error($e->getMessage());
             }
-            response()->end($result);
         } catch (\Error $e) {
             if (method_exists(DI("errorHook"), 'errorHook')) {
                 $result = DI("errorHook")->errorHook($e);
             } else {
                 $result = output::error($e->getMessage());
             }
+        } finally {
+            // response end
             response()->end($result);
+            middleware::after();
         }
     }
 
@@ -94,13 +98,14 @@ class http
         if (\class_exists($current_controller_class)) {
             $controller_obj = new $current_controller_class();
             if (\method_exists($controller_obj, $current_action)) {
-                response()->end($controller_obj->$current_action());
-                middleware::after();
+                $result = $controller_obj->$current_action();
             } else {
                 throw new \Exception("接口地址不存在!");
             }
         } else {
             throw new \Exception("接口地址不存在!");
         }
+
+        return $result;
     }
 }
