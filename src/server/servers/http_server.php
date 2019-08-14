@@ -68,27 +68,9 @@ class http_server
             
         });
         
-        $server->on('task', function ($server, $task_id, $from_id, $data) {
-            call_user_func_array(array(
-                "\\application\\" . app_name() . "\\async\\async", 
-                'task'
-            ), array(
-                $server, 
-                $task_id, 
-                $from_id, 
-                $data
-            ));
-        });
-        
-        $server->on('finish', function ($server, $task_id, $data) {
-            call_user_func_array(array(
-                "\\application\\" . app_name() . "\\async\\async", 
-                'finish'
-            ), array(
-                $server, 
-                $task_id, 
-                $data
-            ));
+        $server->on('task', function (\swoole_server $server, $task_id, $from_id, $data) {
+            $ret = call_user_func_array([new $data["class"], $data["method"]], [$data["data"]]);
+            return is_null($ret) ? '' : $ret;
         });
         
         $server->start();

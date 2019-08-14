@@ -228,3 +228,30 @@ function DI(...$params)
     }
 }
 
+/**
+ * task 开始一个异步任务
+ * $class_method: 处理异步任务的类和方法名，例如: async/test/md::tsd
+ * $data: 传入异步任务的数据
+ * $callback: 异步任务处理完成后执行的回调函数，该回调函数的参数$data为异步任务处理结束时返回的值，$task_id为处理该异步任务的task id
+ * $dst_worker_id: 投递给那个异步task去处理，-1为空闲的任务
+ */
+function task($class_method, $data = '', $callback = '', $dst_worker_id = -1)
+{
+    $cm_arr = explode('::',$class_method);
+    if(count($cm_arr) !=2 ){
+        return false;
+    }
+    
+    list($class, $method) = $cm_arr;
+    $class = '\\application\\' . app_name() . '\\' . str_replace("/", "\\", $class);
+    
+    if(class_exists($class) && method_exists($class, $method)){
+        return server()->task(["class"=>$class, "method"=>$method, "data"=>$data], $dst_worker_id, function($server, $task_id, $data) use($callback){
+            if(is_callable($callback)){
+                $callback($data, $task_id);
+            }
+        });
+    }
+    return false;
+}
+
