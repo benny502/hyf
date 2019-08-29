@@ -194,6 +194,19 @@ function root_path()
 }
 
 /**
+ * @param $key
+ * @return string
+ */
+function json($key = '') {
+    $arr = json_decode(request()->rawContent(), true);
+    if (!$arr) {
+        return '';
+    }
+
+    return !empty($key) ? (isset($arr[$key]) ? $arr[$key] : '') : $arr;
+}
+
+/**
  *
  * @return string
  */
