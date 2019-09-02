@@ -96,11 +96,6 @@ class core
         }
     }
 
-    public function __destruct()
-    {
-        $this->dbh = null;
-    }
-
     public function reconnect($sql, $type = 'query')
     {
         $this->connect();
@@ -112,5 +107,24 @@ class core
         }
         file_put_contents($this->logfile, PHP_EOL . date('Y-m-d H:i:s') . " [reconnect]" . PHP_EOL . $sql . PHP_EOL, FILE_APPEND | LOCK_EX);
         return $result;
+    }
+
+    public function beginTransaction()
+    {
+        $this->dbh->beginTransaction();
+    }
+
+    public function commit()
+    {
+        $this->dbh->commit();
+    }
+
+    public function rollback()
+    {
+        $this->dbh->rollback();
+    }
+
+    public function __destruct() {
+        $this->dbh = null;
     }
 }
