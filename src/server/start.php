@@ -18,7 +18,7 @@ class start
         global $argv;
         
         if (!isset($argv[1]) && !isset($argv[2])) {
-            exit("使用方法 php {http|timer} app_name {start|stop|killall} (-d)\n");
+            exit("使用方法 php {http|timer} app_name {start|stop|killall|reload|reload_task} (-d)\n");
         }
         
         //
@@ -48,7 +48,9 @@ class start
         if (!in_array($argv[2], [
             'start', 
             'stop', 
-            'killall'
+            'killall',
+            'reload',
+            'reload_task'
         ])) {
             exit("参数使用不正确\n");
         }
@@ -96,13 +98,23 @@ class start
             }
             
             self::get_master_pid($server_config['process_name']['master']);
-            
-            if ($action == 'start') {
-                self::startService($server_config);
-            } elseif ($action == 'stop') {
-                self::stopService();
-            } else {
-                self::killall($server_config['app_name']);
+
+            switch ($action) {
+                case 'start':
+                    self::startService($server_config);
+                    break;
+                case 'stop':
+                    self::stopService();
+                    break;
+                case 'killall':
+                    self::killall($server_config['app_name']);
+                    break;
+                case 'reload':
+                    self::reload();
+                    break;
+                case 'reload_task':
+                    self::reload_task();
+                    break;
             }
         } catch (\Exception $e) {
             exit("Error: \n File: {$e->getFile()} ,Line: {$e->getLine()}, Message: {$e->getMessage()}\n");
@@ -171,5 +183,33 @@ class start
     private static function killall($app_name)
     {
         \system('ps -ef|grep hy_' . $app_name . '|grep -v grep|awk \'{print "kill -9 " $2}\' |sh');
+    }
+
+    /**
+     * 平滑重启所有worker，仅针对业务代码所做的修改起效，对全局的定时器、初始化脚本的修改不起作用
+     * @throws \Exception
+     */
+    private static function reload()
+    {
+        if (empty(self::$master_pid)) {
+            throw new \Exception("服务尚未运行\n");
+        } else {
+            \system("kill -USR1 " . self::$master_pid);
+            echo "worker将逐步进行重启\n";
+        }
+    }
+
+    /**
+     * 平滑重启所有task，仅针对业务代码所做的修改起效，对全局的定时器、初始化脚本的修改不起作用
+     * @throws \Exception
+     */
+    private static function reload_task()
+    {
+        if (empty(self::$master_pid)) {
+            throw new \Exception("服务尚未运行\n");
+        } else {
+            \system("kill -USR2 " . self::$master_pid);
+            echo "task将逐步进行重启\n";
+        }
     }
 }
