@@ -93,8 +93,6 @@ class start
                 $server_config['server_set']['dispatch_mode'] = 3;
                 // 设置task async，可以使用协程等
                 $server_config['server_set']['task_async'] = true;
-                // set log file
-                $server_config['server_set']['log_file'] = log_path() . $server_config['app_name'] . '_server.log';
             }
             
             self::get_master_pid($server_config['process_name']['master']);
@@ -152,6 +150,10 @@ class start
             // 全局配置
             \Hyf::$config = include(\Hyf::$dir . 'conf/base.php');
             \Hyf::$app_name = $server_config['app_name'];
+
+            // set log file
+            $server_config['server_set']['log_file'] = log_path() . $server_config['app_name'] . '_server.log';
+
             \Hyf::$server_config = $server_config;
             
             // 一键php原生语句协程化

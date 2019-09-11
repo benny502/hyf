@@ -69,8 +69,10 @@ class http_server
         });
         
         $server->on('task', function (\swoole_server $server, $task_id, $from_id, $data) {
-            $ret = call_user_func_array([new $data["class"], $data["method"]], [$data["data"]]);
-            return is_null($ret) ? '' : $ret;
+            $ret = call_user_func_array([new $data["class"](), $data["method"]], [$data["data"]]);
+            if ($data["finish"]) {
+                return is_null($ret) ? '' : $ret;
+            }
         });
         
         $server->start();

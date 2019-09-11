@@ -254,17 +254,19 @@ function task($class_method, $data = '', $callback = '', $dst_worker_id = -1)
     if(count($cm_arr) !=2 ){
         return false;
     }
-    
+
     list($class, $method) = $cm_arr;
     $class = '\\application\\' . app_name() . '\\' . str_replace("/", "\\", $class);
-    
+
     if(class_exists($class) && method_exists($class, $method)){
-        return server()->task(["class"=>$class, "method"=>$method, "data"=>$data], $dst_worker_id, function($server, $task_id, $data) use($callback){
-            if(is_callable($callback)){
+        if(!empty($callback) && is_callable($callback)){
+            return server()->task(["class"=>$class, "method"=>$method, "data"=>$data, "finish"=>true], $dst_worker_id, function($server, $task_id, $data) use($callback){
                 $callback($data, $task_id);
-            }
-        });
+            });
+        }
+        return server()->task(["class"=>$class, "method"=>$method, "data"=>$data, "finish"=>false], $dst_worker_id);
     }
     return false;
 }
+
 
