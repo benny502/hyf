@@ -26,7 +26,19 @@ class http
             // 处理路由
             switch ($mode) {
                 case 'handle':
+                    if(method_exists("\\application\\" . app_name() . "\\route\\router", "_before")) {
+                        call_user_func_array([
+                            "\\application\\" . app_name() . "\\route\\router",
+                            "_before"
+                        ],[]);
+                    }
                     $result = routerHandle::dispatch();
+                    if(method_exists("\\application\\" . app_name() . "\\route\\router", "_after")) {
+                        call_user_func_array([
+                            "\\application\\" . app_name() . "\\route\\router",
+                            "_after"
+                        ],[]);
+                    }
                     break;
                 case 'normal':
                 case 'group':
