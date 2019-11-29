@@ -26,8 +26,7 @@ class http
             // 处理路由
             switch ($mode) {
                 case 'handle':
-                    $routerHandler = "\\application\\" . app_name() . "\\route\\router";
-                    $result = $routerHandler::Run(routerHandle::class);
+                    $result = routerHandle::dispatch();
                     break;
                 case 'normal':
                 case 'group':

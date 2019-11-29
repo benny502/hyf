@@ -49,6 +49,17 @@ class http_server
             }
         });
         
+        
+        // 注册handle模式路由
+        if(!empty(app_config()['route']['mode']) && app_config()['route']['mode'] == 'handle') {
+            call_user_func_array([
+                "\\application\\" . app_name() . "\\route\\router",
+                "Run"
+            ],[
+                \hyf\component\route\routerHandle::class
+            ]);
+        }
+        
         $server->on('request', function ($request, $response) {
             
             // 将request和response设置为全局对象
@@ -69,10 +80,8 @@ class http_server
         });
         
         $server->on('task', function (\swoole_server $server, $task_id, $from_id, $data) {
-            $ret = call_user_func_array([new $data["class"](), $data["method"]], [$data["data"]]);
-            if ($data["finish"]) {
-                return is_null($ret) ? '' : $ret;
-            }
+            $ret = call_user_func_array([new $data["class"], $data["method"]], [$data["data"]]);
+            return is_null($ret) ? '' : $ret;
         });
         
         $server->start();

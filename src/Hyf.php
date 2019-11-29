@@ -12,7 +12,7 @@ class Hyf
      *
      * @var string
      */
-    public static $version = "2.2.3";
+    public static $version = "2.2.5";
     
     /**
      * 系统主路径
