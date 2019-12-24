@@ -10,6 +10,10 @@ class core
 
     public $dbpass;
 
+    public $strict;
+
+    public $charset;
+
     public $sth;
 
     public $dbh;
@@ -17,7 +21,7 @@ class core
     public $timeout;
 
     public $logfile;
-    
+
     public function __construct($dbType = "mysql")
     {
         $dbConf = \Hyf::$config[$dbType];
@@ -26,12 +30,9 @@ class core
         $this->dbuser = $dbConf['user'];
         $this->dbpass = $dbConf['password'];
         $this->timeout = $dbConf['timeout'];
+        $this->strict = !empty($dbConf['strict']) ? $dbConf['strict'] : false;
+        $this->charset = $dbConf['charset'];
         $this->connect();
-        if (!empty($dbConf['strict'])) {
-            $this->dbh->setAttribute(\PDO::ATTR_STRINGIFY_FETCHES, false);
-            $this->dbh->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
-        }
-        $this->dbh->query('SET NAMES ' . $dbConf['charset']);
     }
 
     private function connect()
@@ -40,6 +41,13 @@ class core
             $this->dbh = new \PDO($this->dsn, $this->dbuser, $this->dbpass, [
                 \PDO::ATTR_TIMEOUT => $this->timeout
             ]);
+            if (!empty($this->strict)) {
+                $this->dbh->setAttribute(\PDO::ATTR_STRINGIFY_FETCHES, false);
+                $this->dbh->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
+            }
+            if (!empty($this->charset)) {
+                $this->dbh->query('SET NAMES ' . $this->charset);
+            }
         } catch (\PDOException $e) {
             file_put_contents($this->logfile, date('Y-m-d H:i:s') . " " . $e->getMessage(), FILE_APPEND | LOCK_EX);
         }
