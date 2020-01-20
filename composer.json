@@ -8,10 +8,9 @@
             "email": "benny502@126.com"
         }
     ],
-    "minimum-stability": "dev",
     "require": {
         "pimple/pimple": "3.0.0",
-        "illuminate/container": "^7.0@dev"
+        "illuminate/container": "^6.11"
     },
     "autoload": {
         "psr-4": {
