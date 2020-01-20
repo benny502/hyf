@@ -1,11 +1,11 @@
 {
-    "name": "hy/hyf",
+    "name": "benny/hyf",
     "description": "swoole framework, include timer, task, async, mvc",
     "type": "project",
     "authors": [
         {
-            "name": "Hyf",
-            "email": "11111111@qq.com"
+            "name": "benny502",
+            "email": "benny502@126.com"
         }
     ],
     "minimum-stability": "dev",
