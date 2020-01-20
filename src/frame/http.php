@@ -32,7 +32,8 @@ class http
                             "_before"
                         ],[]);
                     }
-                    $result = routerHandle::dispatch();
+                    $routerHandler = "\\application\\" . app_name() . "\\route\\router";
+                    $result = $routerHandler::Run(routerHandle::class);
                     if(method_exists("\\application\\" . app_name() . "\\route\\router", "_after")) {
                         call_user_func_array([
                             "\\application\\" . app_name() . "\\route\\router",

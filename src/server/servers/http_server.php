@@ -51,14 +51,14 @@ class http_server
         
         
         // 注册handle模式路由
-        if(!empty(app_config()['route']['mode']) && app_config()['route']['mode'] == 'handle') {
-            call_user_func_array([
-                "\\application\\" . app_name() . "\\route\\router",
-                "Run"
-            ],[
-                \hyf\component\route\routerHandle::class
-            ]);
-        }
+        // if(!empty(app_config()['route']['mode']) && app_config()['route']['mode'] == 'handle') {
+        //     call_user_func_array([
+        //         "\\application\\" . app_name() . "\\route\\router",
+        //         "Run"
+        //     ],[
+        //         \hyf\component\route\routerHandle::class
+        //     ]);
+        // }
         
         $server->on('request', function ($request, $response) {
             
@@ -78,6 +78,8 @@ class http_server
             \hyf\frame\http::Handle();
             
         });
+
+        
         
         $server->on('task', function (\swoole_server $server, $task_id, $from_id, $data) {
             $ret = call_user_func_array([new $data["class"], $data["method"]], [$data["data"]]);
