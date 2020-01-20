@@ -159,7 +159,9 @@ class routerHandle
                                 $segments_m = explode('@', $last_m);
                                 
                                 // Instanitate controller
-                                $controller_m = new $segments_m[0]();
+                                //$controller_m = new $segments_m[0]();
+                                $container = new \Illuminate\Container\Container();
+                                $controller_m = $container->make($segments_m[0]);
                                 
                                 // Call method
                                 $controller_m->{$segments_m[1]}();
@@ -183,7 +185,9 @@ class routerHandle
                         $segments = explode('@', $last);
                         
                         // Instanitate controller
-                        $controller = new $segments[0]();
+                        //$controller = new $segments[0]();
+                        $container = new \Illuminate\Container\Container();
+                        $controller = $container->make($segments[0]);
                         
                         // Call method
                         return $controller->{$segments[1]}();
@@ -226,7 +230,9 @@ class routerHandle
                                     $segments_m = explode('@', $last_m);
                                     
                                     // Instanitate controller
-                                    $controller_m = new $segments_m[0]();
+                                    //$controller_m = new $segments_m[0]();
+                                    $container = new \Illuminate\Container\Container();
+                                    $controller_m = $container->make($segments_m[0]);
                                     
                                     // Call method
                                     $controller_m->{$segments_m[1]}();
@@ -249,7 +255,9 @@ class routerHandle
                             $segments = explode('@', $last);
                             
                             // Instanitate controller
-                            $controller = new $segments[0]();
+                            //$controller = new $segments[0]();
+                            $container = new \Illuminate\Container\Container();
+                            $controller = $container->make($segments[0]);
                             
                             // Fix multi parameters
                             if (!method_exists($controller, $segments[1])) {
